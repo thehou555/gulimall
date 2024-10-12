@@ -10,7 +10,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-class GulimallProductApplicationTests {
+public class GulimallProductApplicationTests {
 
     @Autowired
     private BrandService brandService;
@@ -18,9 +18,16 @@ class GulimallProductApplicationTests {
     @Test
     public void contextLoads() {
         BrandEntity brandEntity = new BrandEntity();
-        brandEntity.setName("华为");
-        brandService.save(brandEntity);
-        System.out.println("保存成功");
+        brandEntity.setBrandId(1L);
+        brandEntity.setDescript("xiaosb");
+        brandService.updateById(brandEntity);
+
+        //brandEntity.setName("小米");
+        //brandService.save(brandEntity);
+        //System.out.println("保存成功");
+        //BrandEntity byId = brandService.getById(2);
+        //System.out.println(byId);
+
     }
 
 }
