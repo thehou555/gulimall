@@ -41,6 +41,25 @@ public class CategoryController {
         return R.ok().put("page", page);
     }
 
+    /**
+     * 以树形结构展示三级分类
+     * @return
+     */
+    @RequestMapping("/list/tree")
+    public R listTree() {
+        return R.ok().put("data", categoryService.listWithTree());
+    }
+
+    /**
+     * 批量修改，参数要传数组，不能传list
+     * @param category
+     * @return
+     */
+    @RequestMapping("/update/sort")
+    public R updateSort(@RequestBody CategoryEntity[] category){
+        categoryService.updateBatchById(Arrays.asList(category));
+        return R.ok();
+    }
 
     /**
      * 信息
@@ -50,7 +69,7 @@ public class CategoryController {
     public R info(@PathVariable("catId") Long catId){
 		CategoryEntity category = categoryService.getById(catId);
 
-        return R.ok().put("category", category);
+        return R.ok().put("data", category);
     }
 
     /**

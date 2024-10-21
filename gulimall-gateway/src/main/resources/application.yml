@@ -7,16 +7,26 @@ spring:
         server-addr: 127.0.0.1:8848
     gateway:
       routes:
-        - id: baidu_route              # 每一个路由的名字，唯一即可
-          uri: https://www.baidu.com   # 匹配后提供服务的路由地址
-          predicates: # 断言规则
-            - Query=url,baidu         #如果url参数等于baidu 符合断言，转到uri
-
-        - id: qq_route                  # 每一个路由的名字，唯一即可
-          uri: https://www.qq.com   # 匹配后提供服务的路由地址
-          predicates: # 断言规则
-            - Query=url,qq         #如果url参数等于baidu 符合断言，转到uri
-
+        # 精确的路由要放在/api的admin_route上面
+        - id: product_route
+          uri: lb://gulimall-product        #路由的目标地址
+          predicates:                    # 路由断言。也就是判断请求是否符合路由规则的条件。
+            - Path=/api/product/**        # 路径断言。这个是按照路径匹配，只要以/api/product/开头就符合要求
+          filters:        #局部过滤器
+            - RewritePath=/api/(?<segment>.*),/$\{segment}    #重写路径，/api/xx过滤成/xx
+        # 人人管理，路径路由。路由id，自定义，只要唯一即可
+        - id: admin_route
+          # uri路由的目标地址。lb就是负载均衡，后面跟服务名称。
+          uri: lb://renren-fast
+          #断言工厂的Path，请求路径必须符合指定规则，才能进行转发
+          predicates:
+            - Path=/api/**    # 把所有api开头的请求都转发给renren-fast
+          #局部过滤器。回顾默认过滤器default-filters是与routes同级
+          filters:
+            - RewritePath=/api/(?<segment>.*),/renren-fast/$\{segment}
+            # 默认规则， 请求过来：http://localhost:88/api/captcha.jpg   转发-->  http://renren-fast:8080/api/captcha.jpg
+            # 但是真正的路径是http://renren-fast:8080/renren-fast/captcha.jpg
+            # 所以使用路径重写把/api/* 改变成 /renren-fast/*
 
   application:
     name: gulimall-gateway
